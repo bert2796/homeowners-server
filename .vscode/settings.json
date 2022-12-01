@@ -1,0 +1,15 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.insertSpaces": false,
+  "files.insertFinalNewline": true,
+  "files.eol": "\n",
+  "files.watcherExclude": {
+    "coverage": true,
+    "node_modules": true,
+    "**/node_modules": true
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "eslint.validate": ["javascript"]
+}

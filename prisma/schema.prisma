@@ -1,0 +1,116 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                      Int              @id              @default(autoincrement())
+  firstName               String          @db.VarChar(128)
+  middleName              String?         @db.VarChar(128)
+  lastName                String          @db.VarChar(128)
+  email                   String          @db.VarChar(128) @unique
+  username                String          @db.VarChar(128) @unique
+  password                String          @db.VarChar(255)
+  hasTemporaryPassword    Boolean         @default(true)
+  role                    UserRoles       @default(Tenant)
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @updatedAt
+  deletedAt               DateTime?
+}
+
+model PropertyType {
+  id                 Int                @id              @default(autoincrement())
+  name               String             @db.VarChar(128) @unique
+  display            String             @db.VarChar(128)
+  description        String?            @db.Text
+  properties         Property[]
+}
+
+model PropertyLocationPhase {
+  id                 Int                @id              @default(autoincrement())
+  name               String             @db.VarChar(128) @unique
+  display            String             @db.VarChar(128)
+  description        String?            @db.Text
+  properties         Property[]
+}
+
+model PropertyLocationBlock {
+  id                 Int                @id              @default(autoincrement())
+  name               String             @db.VarChar(128) @unique
+  display            String             @db.VarChar(128)
+  description        String?            @db.Text
+  properties         Property[]
+}
+
+model Property {
+  id                          Int                      @id              @default(autoincrement())
+  propertyTypeId              Int
+  propertyLocationPhaseId     Int
+  propertyLocationBlockId     Int
+  propertyType                PropertyType             @relation(fields: [propertyTypeId], references: [id])
+  propertyLocationPhase       PropertyLocationPhase    @relation(fields: [propertyLocationPhaseId], references: [id])
+  propertyLocationBlock       PropertyLocationBlock    @relation(fields: [propertyLocationBlockId], references: [id])
+  name                        String                   @db.VarChar(255)
+  amount                      String                   @db.VarChar(255)
+  code                        String                   @db.VarChar(255) @unique
+  location                    String                   @db.VarChar(255)
+  description                 String?                  @db.Text
+  bathrooms                   Int                      @default(0)
+  bedrooms                    Int                      @default(0)
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @updatedAt
+  deletedAt               DateTime?
+}
+
+model Facility {
+  id                 Int                @id              @default(autoincrement())
+  name               String             @db.VarChar(128)
+  description        String?            @db.Text
+  facilityPayment    FacilityPayment?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  deletedAt          DateTime?
+}
+
+
+model FacilityPayment {
+  id            Int                    @id @default(autoincrement())
+  facility      Facility               @relation(fields: [facilityId], references: [id])
+  type          FacilityPaymentTypes
+  facilityId    Int                    @unique
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  deletedAt     DateTime?
+}
+
+model Announcement {
+  id            Int                @id @default(autoincrement())
+  title         String             @db.VarChar(128)
+  description   String?            @db.Text
+  location      String?            @db.VarChar(255)
+  startDate     String?            @db.VarChar(255)
+  endDate       String?            @db.VarChar(255)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  deletedAt     DateTime?
+}
+
+enum UserRoles {
+  Admin
+  Staff
+  Tenant
+}
+
+enum FacilityPaymentTypes {
+  RequireDP
+  RequireFP
+  None
+}
