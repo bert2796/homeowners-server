@@ -7,8 +7,12 @@ import { AuthorizeGuard } from './commons/guards/authorize.guard';
 import { AnnouncementModule } from './modules/announcement/announcement.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from './modules/config/config.module';
+import { ExtraModule } from './modules/extra/extra.module';
+import { LeaseModule } from './modules/lease/lease.module';
+import { PollModule } from './modules/poll/poll.module';
 import { PropertyModule } from './modules/property/property.module';
 import { UserModule } from './modules/user/user.module';
+import { UtilityModule } from './modules/utility/utility.module';
 
 @Module({
   imports: [
@@ -31,8 +35,12 @@ import { UserModule } from './modules/user/user.module';
     ConfigModule,
     AnnouncementModule,
     AuthModule,
+    ExtraModule,
+    LeaseModule,
     UserModule,
+    PollModule,
     PropertyModule,
+    UtilityModule,
   ],
   providers: [
     {

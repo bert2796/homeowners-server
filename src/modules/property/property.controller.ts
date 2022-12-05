@@ -44,9 +44,9 @@ export class PropertyController {
   }
 
   @Post('/')
-  @HttpCode(HttpStatus.ACCEPTED)
+  @HttpCode(HttpStatus.CREATED)
   @Authorize([UserRoles.Admin, UserRoles.Staff])
-  async createUser(@Body() params: CreatePropertyDto) {
+  async createProperty(@Body() params: CreatePropertyDto) {
     return await this.service.create(params);
   }
 

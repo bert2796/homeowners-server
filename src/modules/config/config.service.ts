@@ -4,7 +4,7 @@ import { parse } from 'dotenv';
 import { readFileSync } from 'fs';
 import * as joi from 'joi';
 
-import { Config } from '../../commons/types';
+import { Config, SpaceConfig } from '../../commons/types';
 
 @Injectable()
 export class ConfigService {
@@ -58,6 +58,16 @@ export class ConfigService {
   getJwtConfig(): JwtModuleOptions {
     return {
       secret: this.get('JWT_ACCESS_TOKEN_SECRET') as string,
+    };
+  }
+
+  getSpaceConfig(): SpaceConfig {
+    return {
+      credentials: {
+        accessKeyId: this.get('SPACE_ACCESS_KEY_ID') as string,
+        secretAccessKey: this.get('SPACE_SECRET_ACCESS_KEY') as string,
+      },
+      endpoint: this.get('SPACE_ENDPOINT') as string,
     };
   }
 

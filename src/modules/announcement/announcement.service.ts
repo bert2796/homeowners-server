@@ -13,13 +13,23 @@ export class AnnouncementService {
   private findUnique = this.model.findUnique;
 
   async findOneOrThrow(id: number) {
-    const property = await this.findOne(id);
-    if (!property) {
+    const announcement = await this.findUnique({ where: { id } });
+    if (!announcement) {
       throw new HttpException(
         'Announcement does not exist.',
         HttpStatus.BAD_REQUEST,
       );
     }
+
+    return announcement;
+  }
+
+  async findAll() {
+    return await this.findMany();
+  }
+
+  async findOne(id: number) {
+    return await this.findOneOrThrow(id);
   }
 
   async create(params: CreateAnnouncementDto) {
@@ -39,13 +49,5 @@ export class AnnouncementService {
     await this.findOneOrThrow(id);
 
     return await this.model.delete({ where: { id } });
-  }
-
-  async findAll() {
-    return await this.findMany();
-  }
-
-  async findOne(id: number) {
-    return await this.findUnique({ where: { id } });
   }
 }

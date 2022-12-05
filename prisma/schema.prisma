@@ -3,7 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["interactiveTransactions"]
+  previewFeatures = []
 }
 
 datasource db {
@@ -21,6 +21,7 @@ model User {
   password                String          @db.VarChar(255)
   hasTemporaryPassword    Boolean         @default(true)
   role                    UserRoles       @default(Tenant)
+  leases                  Lease[]
   createdAt               DateTime        @default(now())
   updatedAt               DateTime        @updatedAt
   deletedAt               DateTime?
@@ -55,9 +56,10 @@ model Property {
   propertyTypeId              Int
   propertyLocationPhaseId     Int
   propertyLocationBlockId     Int
-  propertyType                PropertyType             @relation(fields: [propertyTypeId], references: [id])
-  propertyLocationPhase       PropertyLocationPhase    @relation(fields: [propertyLocationPhaseId], references: [id])
-  propertyLocationBlock       PropertyLocationBlock    @relation(fields: [propertyLocationBlockId], references: [id])
+  propertyType                PropertyType             @relation(fields: [propertyTypeId], references: [id], onDelete: Restrict)
+  propertyLocationPhase       PropertyLocationPhase    @relation(fields: [propertyLocationPhaseId], references: [id], onDelete: Restrict)
+  propertyLocationBlock       PropertyLocationBlock    @relation(fields: [propertyLocationBlockId], references: [id], onDelete: Restrict)
+  leasese                     Lease[]
   name                        String                   @db.VarChar(255)
   amount                      String                   @db.VarChar(255)
   code                        String                   @db.VarChar(255) @unique
@@ -70,22 +72,90 @@ model Property {
   deletedAt               DateTime?
 }
 
+model Utility {
+  id                 Int                @id              @default(autoincrement())
+  name               String             @db.VarChar(128) @unique
+  display            String             @db.VarChar(128)
+  description        String?            @db.Text
+  leaseUtilityCharges LeaseUtilityCharge[]
+}
+
+model Extra {
+  id                 Int                @id              @default(autoincrement())
+  name               String             @db.VarChar(128) @unique
+  display            String             @db.VarChar(128)
+  description        String?            @db.Text
+  leaseExtraCharges  LeaseExtraCharge[]
+}
+
 model Facility {
   id                 Int                @id              @default(autoincrement())
   name               String             @db.VarChar(128)
   description        String?            @db.Text
-  facilityPayment    FacilityPayment?
+  amount             String?            @db.VarChar(128)
+  facilityPayment    FacilityPaymentSetting?
+  facilityImages     FacilityImage[]
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
   deletedAt          DateTime?
 }
 
 
-model FacilityPayment {
+model FacilityPaymentSetting {
   id            Int                    @id @default(autoincrement())
-  facility      Facility               @relation(fields: [facilityId], references: [id])
+  facility      Facility               @relation(fields: [facilityId], references: [id], onDelete: Cascade)
   type          FacilityPaymentTypes
   facilityId    Int                    @unique
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  deletedAt     DateTime?
+}
+
+model FacilityImage {
+  id            Int                    @id @default(autoincrement())
+  facility      Facility               @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+  url           String                 @db.VarChar(255)
+  facilityId    Int
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  deletedAt     DateTime?
+}
+
+model Lease {
+  id                    Int                    @id @default(autoincrement())
+  property              Property               @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  tenant                User                   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  leaseUtilityCharges   LeaseUtilityCharge[]
+  leaseExtraCharges     LeaseExtraCharge[]
+  propertyId            Int
+  tenantId              Int
+  rentalAmount          String?
+  totalAmount           String
+  date                  String
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  deletedAt             DateTime?
+}
+
+model LeaseUtilityCharge {
+  id            Int                    @id @default(autoincrement())
+  lease         Lease                  @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+  utility       Utility                @relation(fields: [utilityId], references: [id], onDelete: Cascade)
+  leaseId       Int
+  utilityId     Int
+  amount        String?
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  deletedAt     DateTime?
+}
+
+model LeaseExtraCharge {
+  id            Int                    @id @default(autoincrement())
+  lease         Lease                  @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+  extra         Extra                @relation(fields: [extraId], references: [id], onDelete: Cascade)
+  leaseId       Int
+  extraId       Int
+  amount        String?
   createdAt     DateTime               @default(now())
   updatedAt     DateTime               @updatedAt
   deletedAt     DateTime?
@@ -101,6 +171,25 @@ model Announcement {
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
   deletedAt     DateTime?
+}
+
+model Poll {
+  id            Int                @id @default(autoincrement())
+  title         String             @db.VarChar(128)
+  description   String?            @db.Text
+  endDate       String?            @db.VarChar(255)
+  allowedAnswer Int               @db.Int @default(1)
+  pollChoices   PollChoice[]
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  deletedAt     DateTime?
+}
+
+model PollChoice {
+  id                  Int           @id @default(autoincrement())
+  poll                Poll          @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  pollId              Int
+  option              String        @db.VarChar(255)
 }
 
 enum UserRoles {

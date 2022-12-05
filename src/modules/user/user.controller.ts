@@ -44,13 +44,12 @@ export class UserController {
 
   @Patch('/:id')
   @HttpCode(HttpStatus.OK)
-  @Authorize()
   async updateUser(@Param('id') id: string, @Body() params: UpdateUserDto) {
     return await this.service.update(+id, params);
   }
 
   @Post('/')
-  @HttpCode(HttpStatus.ACCEPTED)
+  @HttpCode(HttpStatus.CREATED)
   @Authorize([UserRoles.Admin, UserRoles.Staff])
   async createUser(@Body() params: CreateUserDto) {
     return await this.service.create(params);

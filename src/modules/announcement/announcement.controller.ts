@@ -44,7 +44,7 @@ export class AnnouncementController {
   }
 
   @Post('/')
-  @HttpCode(HttpStatus.ACCEPTED)
+  @HttpCode(HttpStatus.CREATED)
   @Authorize([UserRoles.Admin, UserRoles.Staff])
   async createAnnouncement(@Body() params: CreateAnnouncementDto) {
     return await this.service.create(params);

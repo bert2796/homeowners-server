@@ -21,10 +21,12 @@ export class UserService {
   }
 
   async findOneOrThrow(id: number) {
-    const user = await this.findOne(id);
+    const user = await this.findUnique({ where: { id } });
     if (!user) {
       throw new HttpException('User does not exist.', HttpStatus.BAD_REQUEST);
     }
+
+    return user;
   }
 
   async create(params: CreateUserDto) {
@@ -81,9 +83,7 @@ export class UserService {
   }
 
   async findOne(id: number) {
-    const user = await this.findUnique({
-      where: { id },
-    });
+    const user = await this.findOneOrThrow(id);
 
     return this.exclude(user, ['password']);
   }

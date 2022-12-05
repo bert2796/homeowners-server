@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Prisma, Property, PropertyLocationBlock } from '@prisma/client';
+import { Prisma, Property } from '@prisma/client';
 import { createPaginator } from 'prisma-pagination';
 
 import { PaginateParams } from '../../commons/types';
@@ -26,49 +26,31 @@ export class PropertyService {
   private async validateRelation(
     params: CreatePropertyDto | UpdatePropertyDto,
   ) {
-    const propertyType = await this.propertyTypeService.findOne(
-      params.propertyTypeId,
-    );
-    if (!propertyType) {
-      throw new HttpException(
-        'Property type does not exist.',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    await this.propertyTypeService.findOneOrThrow(params.propertyTypeId);
 
-    const propertyBlock = await this.propertyBlockService.findOne(
+    await this.propertyBlockService.findOneOrThrow(
       params.propertyLocationBlockId,
     );
-    if (!propertyBlock) {
-      throw new HttpException(
-        'Property location block does not exist.',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
 
-    const propertyPhase = await this.propertyPhaseService.findOne(
+    await this.propertyPhaseService.findOneOrThrow(
       params.propertyLocationPhaseId,
     );
-    if (!propertyPhase) {
-      throw new HttpException(
-        'Property location phase does not exist.',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
   }
 
   async findOneOrThrow(id: number) {
-    const property = await this.findOne(id);
+    const property = await this.findUnique({ where: { id } });
     if (!property) {
       throw new HttpException(
         'Property does not exist.',
         HttpStatus.BAD_REQUEST,
       );
     }
+
+    return property;
   }
 
   async findOne(id: number) {
-    return await this.findUnique({
+    const property = await this.findUnique({
       include: {
         propertyLocationBlock: true,
         propertyLocationPhase: true,
@@ -76,6 +58,14 @@ export class PropertyService {
       },
       where: { id },
     });
+    if (!property) {
+      throw new HttpException(
+        'Property does not exist.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return property;
   }
 
   async findAll() {
@@ -116,7 +106,18 @@ export class PropertyService {
   async create(params: CreatePropertyDto) {
     await this.validateRelation(params);
 
-    return await this.model.create({ data: params });
+    try {
+      return await this.model.create({ data: params });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          throw new HttpException(
+            `Property with code ${params.code} is already existing`,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      }
+    }
   }
 
   async update(id: number, params: UpdatePropertyDto) {
@@ -132,6 +133,6 @@ export class PropertyService {
   async delete(id: number) {
     await this.findOneOrThrow(id);
 
-    return await this.prisma.property.delete({ where: { id } });
+    return await this.model.delete({ where: { id } });
   }
 }
