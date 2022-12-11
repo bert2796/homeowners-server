@@ -5,7 +5,7 @@ CREATE TABLE `LeasePayment` (
     `userId` INTEGER NOT NULL,
     `status` ENUM('Approved', 'Rejected', 'Pending') NOT NULL DEFAULT 'Pending',
     `amount` VARCHAR(191) NOT NULL,
-    `reason` VARCHAR(191) NULL;
+    `reason` VARCHAR(191) NULL,
     `otherReason` VARCHAR(191) NULL,
     `otherReasonDetails` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
