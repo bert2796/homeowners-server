@@ -34,20 +34,37 @@ export class LeaseService {
     return lease;
   }
 
-  async findAll() {
+  async findAll(userId?: number) {
     return await this.findMany({
       include: {
         property: true,
         tenant: true,
+        ...(userId && {
+          leasePayments: {
+            orderBy: {
+              id: 'desc',
+            },
+            take: 1,
+          },
+        }),
       },
+      ...(userId && { where: { tenantId: userId } }),
     });
   }
 
   async findOne(id: number) {
     const lease = await this.findUnique({
       include: {
-        leaseExtraCharges: true,
-        leaseUtilityCharges: true,
+        leaseExtraCharges: {
+          include: {
+            extra: true,
+          },
+        },
+        leaseUtilityCharges: {
+          include: {
+            utility: true,
+          },
+        },
         property: true,
         tenant: true,
       },
@@ -61,6 +78,20 @@ export class LeaseService {
   }
 
   async create(params: CreateLeaseDto) {
+    const lease = await this.model.findFirst({
+      where: {
+        date: params.date,
+        propertyId: params.propertyId,
+        tenantId: params.tenantId,
+      },
+    });
+    if (lease) {
+      throw new HttpException(
+        'Lease is already existing.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     // validate property
     await this.propertyService.findOneOrThrow(params.propertyId);
 
@@ -69,9 +100,9 @@ export class LeaseService {
 
     const extraChargesAmounts: Big[] = [];
     // validate if extra charges are existing
-    if (params.extraCharges.length) {
-      for (const { extraId, amount } of params.extraCharges) {
-        await this.extraService.findOneOrThrow(extraId);
+    if (params.leaseExtraCharges.length) {
+      for (const { id, amount } of params.leaseExtraCharges) {
+        await this.extraService.findOneOrThrow(id);
 
         extraChargesAmounts.push(new Big(amount));
       }
@@ -80,9 +111,9 @@ export class LeaseService {
     const utilityChargesAmounts: Big[] = [];
 
     // validate if utility charges are existing
-    if (params.utilityCharges.length) {
-      for (const { utilityId, amount } of params.utilityCharges) {
-        await this.utilityService.findOneOrThrow(utilityId);
+    if (params.leaseUtilityCharges.length) {
+      for (const { id, amount } of params.leaseUtilityCharges) {
+        await this.utilityService.findOneOrThrow(id);
 
         utilityChargesAmounts.push(new Big(amount));
       }
@@ -117,17 +148,17 @@ export class LeaseService {
         ...leaseData,
         leaseExtraCharges: {
           createMany: {
-            data: params.extraCharges.map((extraCharge) => ({
+            data: params.leaseExtraCharges.map((extraCharge) => ({
               amount: extraCharge.amount,
-              extraId: extraCharge.extraId,
+              extraId: extraCharge.id,
             })),
           },
         },
         leaseUtilityCharges: {
           createMany: {
-            data: params.utilityCharges.map((utilityCharge) => ({
+            data: params.leaseUtilityCharges.map((utilityCharge) => ({
               amount: utilityCharge.amount,
-              utilityId: utilityCharge.utilityId,
+              utilityId: utilityCharge.id,
             })),
           },
         },

@@ -1,7 +1,9 @@
+import { LeaseTypes } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -25,13 +27,13 @@ export class CreateLeaseDto {
   @ValidateNested({ each: true })
   @ArrayMinSize(1)
   @Type(() => UtilityChargeDto)
-  readonly utilityCharges: UtilityChargeDto[];
+  readonly leaseUtilityCharges: UtilityChargeDto[];
 
   @IsArray()
   @ValidateNested({ each: true })
   @ArrayMinSize(1)
   @Type(() => ExtraChargeDto)
-  readonly extraCharges: ExtraChargeDto[];
+  readonly leaseExtraCharges: ExtraChargeDto[];
 
   @IsOptional()
   @IsString()
@@ -40,4 +42,8 @@ export class CreateLeaseDto {
   @IsNotEmpty()
   @IsString()
   readonly date: string;
+
+  @IsOptional()
+  @IsEnum(LeaseTypes)
+  readonly type?: LeaseTypes;
 }

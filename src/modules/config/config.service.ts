@@ -39,6 +39,9 @@ export class ConfigService {
       JWT_REFRESH_TOKEN_EXP: joi.string().required(),
       JWT_REFRESH_TOKEN_SECRET: joi.string().required(),
       PORT: joi.number().required(),
+      SPACE_ACCESS_KEY_ID: joi.string().required(),
+      SPACE_ENDPOINT: joi.string().required(),
+      SPACE_SECRET_ACCESS_KEY: joi.string().required(),
       // STRIPE_API_KEY: joi.string().required(),
       // STRIPE_WEBHOOK_SECRET: joi.string().required(),
     });

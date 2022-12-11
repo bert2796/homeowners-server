@@ -9,6 +9,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from './modules/config/config.module';
 import { ExtraModule } from './modules/extra/extra.module';
 import { LeaseModule } from './modules/lease/lease.module';
+import { PaymentModule } from './modules/payment/payment.module';
 import { PollModule } from './modules/poll/poll.module';
 import { PropertyModule } from './modules/property/property.module';
 import { UserModule } from './modules/user/user.module';
@@ -38,6 +39,7 @@ import { UtilityModule } from './modules/utility/utility.module';
     ExtraModule,
     LeaseModule,
     UserModule,
+    PaymentModule,
     PollModule,
     PropertyModule,
     UtilityModule,

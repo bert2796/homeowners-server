@@ -12,7 +12,7 @@ datasource db {
 }
 
 model User {
-  id                      Int              @id              @default(autoincrement())
+  id                      Int             @id              @default(autoincrement())
   firstName               String          @db.VarChar(128)
   middleName              String?         @db.VarChar(128)
   lastName                String          @db.VarChar(128)
@@ -22,6 +22,7 @@ model User {
   hasTemporaryPassword    Boolean         @default(true)
   role                    UserRoles       @default(Tenant)
   leases                  Lease[]
+  leasePayments           LeasePayment[]
   createdAt               DateTime        @default(now())
   updatedAt               DateTime        @updatedAt
   deletedAt               DateTime?
@@ -127,11 +128,13 @@ model Lease {
   tenant                User                   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
   leaseUtilityCharges   LeaseUtilityCharge[]
   leaseExtraCharges     LeaseExtraCharge[]
+  leasePayments         LeasePayment[]
   propertyId            Int
   tenantId              Int
   rentalAmount          String?
   totalAmount           String
   date                  String
+  type                  LeaseTypes             @default(Rental)
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
   deletedAt             DateTime?
@@ -152,13 +155,40 @@ model LeaseUtilityCharge {
 model LeaseExtraCharge {
   id            Int                    @id @default(autoincrement())
   lease         Lease                  @relation(fields: [leaseId], references: [id], onDelete: Cascade)
-  extra         Extra                @relation(fields: [extraId], references: [id], onDelete: Cascade)
+  extra         Extra                  @relation(fields: [extraId], references: [id], onDelete: Cascade)
   leaseId       Int
   extraId       Int
   amount        String?
   createdAt     DateTime               @default(now())
   updatedAt     DateTime               @updatedAt
   deletedAt     DateTime?
+}
+
+model LeasePayment {
+  id                    Int                    @id @default(autoincrement())
+  lease                 Lease                  @relation(fields: [leaseId], references: [id], onDelete: Restrict)
+  leaseId               Int
+  user                  User                   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  userId                Int
+  status                LeasePaymentStatuses   @default(Pending)
+  amount                String
+  leasePaymentImages    LeasePaymentImage[]
+  reason                String?
+  otherReason           String?
+  otherReasonDetails    String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  deletedAt             DateTime?
+}
+
+model LeasePaymentImage {
+  id                Int                    @id @default(autoincrement())
+  leasePayment      LeasePayment           @relation(fields: [leasePaymentId], references: [id], onDelete: Cascade)
+  leasePaymentId    Int
+  url               String                 @db.Text
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+  deletedAt         DateTime?
 }
 
 model Announcement {
@@ -202,4 +232,15 @@ enum FacilityPaymentTypes {
   RequireDP
   RequireFP
   None
+}
+
+enum LeaseTypes {
+  Rental
+  Homeowner
+}
+
+enum LeasePaymentStatuses {
+  Approved
+  Rejected
+  Pending
 }

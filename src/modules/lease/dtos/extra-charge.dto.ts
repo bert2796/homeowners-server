@@ -3,7 +3,7 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 export class ExtraChargeDto {
   @IsNotEmpty()
   @IsNumber()
-  readonly extraId: number;
+  readonly id: number;
 
   @IsNotEmpty()
   @IsString()

@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
 } from '@nestjs/common';
 import { UserRoles } from '@prisma/client';
 
@@ -21,8 +22,8 @@ export class LeaseController {
   @Get('/')
   @HttpCode(HttpStatus.OK)
   @Authorize()
-  async getLeases() {
-    return await this.service.findAll();
+  async getLeases(@Query() query: { userId: string }) {
+    return await this.service.findAll(+query.userId);
   }
 
   @Get('/:id')
