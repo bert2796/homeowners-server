@@ -113,13 +113,13 @@ export class FacilityService {
 
   async findAll() {
     return await this.findMany({
-      include: { facilityImages: true, facilityPayment: true },
+      include: { facilityImages: true, facilityPaymentSetting: true },
     });
   }
 
   async findOne(id: number) {
     const facility = await this.findUnique({
-      include: { facilityImages: true, facilityPayment: true },
+      include: { facilityImages: true, facilityPaymentSetting: true },
       where: { id },
     });
     if (!facility) {
