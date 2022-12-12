@@ -63,7 +63,23 @@ export class FacilityService {
   }
 
   async create(params: CreateFacilityDto, images: Express.Multer.File[]) {
-    const facility = await this.model.create({ data: params });
+    // create facility
+    const facility = await this.model.create({
+      data: {
+        description: params.description,
+        name: params.name,
+      },
+    });
+
+    // create facility payment setting
+    await this.prisma.facilityPaymentSetting.create({
+      data: {
+        amount: params.amount,
+        downPayment: params.downPayment,
+        facilityId: facility.id,
+        type: params.type,
+      },
+    });
 
     if (images?.length) {
       await this.uploadImages(facility, images);

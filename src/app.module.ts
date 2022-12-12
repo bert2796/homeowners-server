@@ -8,6 +8,7 @@ import { AnnouncementModule } from './modules/announcement/announcement.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from './modules/config/config.module';
 import { ExtraModule } from './modules/extra/extra.module';
+import { FacilityModule } from './modules/facility/facility.module';
 import { LeaseModule } from './modules/lease/lease.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { PollModule } from './modules/poll/poll.module';
@@ -37,6 +38,7 @@ import { UtilityModule } from './modules/utility/utility.module';
     AnnouncementModule,
     AuthModule,
     ExtraModule,
+    FacilityModule,
     LeaseModule,
     UserModule,
     PaymentModule,

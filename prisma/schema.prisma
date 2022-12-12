@@ -90,15 +90,14 @@ model Extra {
 }
 
 model Facility {
-  id                 Int                @id              @default(autoincrement())
-  name               String             @db.VarChar(128)
-  description        String?            @db.Text
-  amount             String?            @db.VarChar(128)
-  facilityPayment    FacilityPaymentSetting?
-  facilityImages     FacilityImage[]
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
-  deletedAt          DateTime?
+  id                        Int                @id              @default(autoincrement())
+  name                      String             @db.VarChar(128)
+  description               String?            @db.Text
+  facilityPaymentSetting    FacilityPaymentSetting?
+  facilityImages            FacilityImage[]
+  createdAt                 DateTime           @default(now())
+  updatedAt                 DateTime           @updatedAt
+  deletedAt                 DateTime?
 }
 
 
@@ -106,7 +105,9 @@ model FacilityPaymentSetting {
   id            Int                    @id @default(autoincrement())
   facility      Facility               @relation(fields: [facilityId], references: [id], onDelete: Cascade)
   type          FacilityPaymentTypes
+  amount        String?
   facilityId    Int                    @unique
+  downPayment   String?
   createdAt     DateTime               @default(now())
   updatedAt     DateTime               @updatedAt
   deletedAt     DateTime?
@@ -229,9 +230,8 @@ enum UserRoles {
 }
 
 enum FacilityPaymentTypes {
-  RequireDP
-  RequireFP
-  None
+  PerHour
+  WholeDay
 }
 
 enum LeaseTypes {

@@ -2,7 +2,9 @@
 -- CreateTable
 CREATE TABLE `FacilityPaymentSetting` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `type` ENUM('RequireDP', 'RequireFP', 'None') NOT NULL,
+    `type` ENUM('PerHour', 'WholeDay') NOT NULL,
+    `amount` VARCHAR(191) NULL,
+    `downPayment` VARCHAR(191) NULL,
     `facilityId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
