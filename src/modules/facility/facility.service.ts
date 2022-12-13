@@ -51,15 +51,15 @@ export class FacilityService {
   }
 
   async findOneOrThrow(id: number) {
-    const property = await this.findOne(id);
-    if (!property) {
+    const facility = await this.findOne(id);
+    if (!facility) {
       throw new HttpException(
         'Facility does not exist.',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    return property;
+    return facility;
   }
 
   async create(params: CreateFacilityDto, images: Express.Multer.File[]) {

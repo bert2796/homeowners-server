@@ -30,7 +30,7 @@ export class PaymentController {
   @Authorize([UserRoles.Admin, UserRoles.Staff])
   async updateAnnouncement(
     @Param('id') id: string,
-    @Param('type') type: 'lease' | 'facility',
+    @Param('type') type: 'lease' | 'reservation',
     @Body() params: UpdatePaymentDto,
   ) {
     return await this.service.update(type, +id, params);

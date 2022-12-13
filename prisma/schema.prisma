@@ -23,6 +23,8 @@ model User {
   role                    UserRoles       @default(Tenant)
   leases                  Lease[]
   leasePayments           LeasePayment[]
+  reservations            Reservation[]
+  reservationPayments     ReservationPayment[]
   createdAt               DateTime        @default(now())
   updatedAt               DateTime        @updatedAt
   deletedAt               DateTime?
@@ -95,6 +97,7 @@ model Facility {
   description               String?            @db.Text
   facilityPaymentSetting    FacilityPaymentSetting?
   facilityImages            FacilityImage[]
+  reservations              Reservation[]
   createdAt                 DateTime           @default(now())
   updatedAt                 DateTime           @updatedAt
   deletedAt                 DateTime?
@@ -191,6 +194,49 @@ model LeasePaymentImage {
   updatedAt         DateTime               @updatedAt
   deletedAt         DateTime?
 }
+
+model Reservation {
+  id                    Int                    @id @default(autoincrement())
+  facility              Facility               @relation(fields: [facilityId], references: [id], onDelete: Restrict)
+  tenant                User                   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  facilityId            Int
+  tenantId              Int
+  totalAmount           String
+  startDate             String
+  endDate               String
+  reservationPayments    ReservationPayment[]
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  deletedAt             DateTime?
+}
+
+model ReservationPayment {
+  id                      Int                    @id @default(autoincrement())
+  reservation             Reservation            @relation(fields: [reservationId], references: [id], onDelete: Restrict)
+  reservationId           Int
+  user                    User                   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  userId                  Int
+  status                  LeasePaymentStatuses   @default(Pending)
+  amount                  String
+  reason                  String?
+  otherReason             String?
+  otherReasonDetails      String?
+  reservationPaymentImages ReservationPaymentImage[]
+  createdAt               DateTime               @default(now())
+  updatedAt               DateTime               @updatedAt
+  deletedAt               DateTime?
+}
+
+model ReservationPaymentImage {
+  id                      Int                    @id @default(autoincrement())
+  reservationPayment      ReservationPayment     @relation(fields: [reservationPaymentId], references: [id], onDelete: Cascade)
+  reservationPaymentId    Int
+  url                     String                 @db.Text
+  createdAt               DateTime               @default(now())
+  updatedAt               DateTime               @updatedAt
+  deletedAt               DateTime?
+}
+
 
 model Announcement {
   id            Int                @id @default(autoincrement())

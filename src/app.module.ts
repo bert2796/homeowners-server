@@ -13,6 +13,7 @@ import { LeaseModule } from './modules/lease/lease.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { PollModule } from './modules/poll/poll.module';
 import { PropertyModule } from './modules/property/property.module';
+import { ReservationModule } from './modules/reservation/reservation.module';
 import { UserModule } from './modules/user/user.module';
 import { UtilityModule } from './modules/utility/utility.module';
 
@@ -44,6 +45,7 @@ import { UtilityModule } from './modules/utility/utility.module';
     PaymentModule,
     PollModule,
     PropertyModule,
+    ReservationModule,
     UtilityModule,
   ],
   providers: [

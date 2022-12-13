@@ -32,7 +32,7 @@ export class FacilityController {
   @Get('/:id')
   @HttpCode(HttpStatus.OK)
   @Authorize()
-  async getAnnouncement(@Param('id') id: string) {
+  async getFacility(@Param('id') id: string) {
     return await this.service.findOne(+id);
   }
 
@@ -40,7 +40,7 @@ export class FacilityController {
   @UseInterceptors(FilesInterceptor('images'))
   @HttpCode(HttpStatus.OK)
   @Authorize([UserRoles.Admin, UserRoles.Staff])
-  async updateAnnouncement(
+  async updateFacility(
     @Param('id') id: string,
     @Body() params: UpdateFacilityDto,
     @UploadedFiles() images: Express.Multer.File[],
@@ -52,7 +52,7 @@ export class FacilityController {
   @UseInterceptors(FilesInterceptor('images'))
   @HttpCode(HttpStatus.CREATED)
   @Authorize([UserRoles.Admin, UserRoles.Staff])
-  async createAnnouncement(
+  async createFacility(
     @Body() params: CreateFacilityDto,
     @UploadedFiles() images: Express.Multer.File[],
   ) {
@@ -62,7 +62,7 @@ export class FacilityController {
   @Delete('/:id')
   @HttpCode(HttpStatus.OK)
   @Authorize([UserRoles.Admin, UserRoles.Staff])
-  async deleteAnnouncement(@Param('id') id: string) {
+  async deleteFacility(@Param('id') id: string) {
     return await this.service.delete(+id);
   }
 }

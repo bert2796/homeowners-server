@@ -92,6 +92,14 @@ export class LeaseService {
       );
     }
 
+    // const hasPropertyAlreadyAssigned = await this.model.findFirst({
+    //   where: {
+    //     date: {
+    //       equals: {}
+    //     }
+    //   }
+    // })
+
     // validate property
     await this.propertyService.findOneOrThrow(params.propertyId);
 
