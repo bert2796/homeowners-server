@@ -22,14 +22,14 @@ export class PollService {
   }
 
   async create(params: CreatePollDto) {
-    const { options, ...pollData } = params;
+    const { choices, ...pollData } = params;
 
     return await this.model.create({
       data: {
         ...pollData,
         pollChoices: {
           createMany: {
-            data: options.map((option) => ({ option })),
+            data: choices.map((option) => ({ option })),
           },
         },
       },

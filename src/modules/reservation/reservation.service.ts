@@ -67,6 +67,18 @@ export class ReservationService {
   }
 
   async create(params: CreateReservationDto) {
+    const reservation = await this.findFirst({
+      where: {
+        startDate: params.startDate,
+      },
+    });
+    if (reservation) {
+      throw new HttpException(
+        'Reservation already exist.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     // validate facility
     const facility = await this.facilityService.findOneOrThrow(
       params.facilityId,

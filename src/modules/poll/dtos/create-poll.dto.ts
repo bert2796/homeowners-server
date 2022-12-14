@@ -13,7 +13,7 @@ export class CreatePollDto {
 
   @ArrayNotEmpty()
   @IsString({ each: true })
-  readonly options: string[];
+  readonly choices: string[];
 
   @IsOptional()
   @IsString()

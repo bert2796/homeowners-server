@@ -59,9 +59,9 @@ model Property {
   propertyTypeId              Int
   propertyLocationPhaseId     Int
   propertyLocationBlockId     Int
-  propertyType                PropertyType             @relation(fields: [propertyTypeId], references: [id], onDelete: Restrict)
-  propertyLocationPhase       PropertyLocationPhase    @relation(fields: [propertyLocationPhaseId], references: [id], onDelete: Restrict)
-  propertyLocationBlock       PropertyLocationBlock    @relation(fields: [propertyLocationBlockId], references: [id], onDelete: Restrict)
+  propertyType                PropertyType             @relation(fields: [propertyTypeId], references: [id], onDelete: Cascade)
+  propertyLocationPhase       PropertyLocationPhase    @relation(fields: [propertyLocationPhaseId], references: [id], onDelete: Cascade)
+  propertyLocationBlock       PropertyLocationBlock    @relation(fields: [propertyLocationBlockId], references: [id], onDelete: Cascade)
   leasese                     Lease[]
   name                        String                   @db.VarChar(255)
   amount                      String                   @db.VarChar(255)
@@ -128,8 +128,8 @@ model FacilityImage {
 
 model Lease {
   id                    Int                    @id @default(autoincrement())
-  property              Property               @relation(fields: [propertyId], references: [id], onDelete: Restrict)
-  tenant                User                   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  property              Property               @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  tenant                User                   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   leaseUtilityCharges   LeaseUtilityCharge[]
   leaseExtraCharges     LeaseExtraCharge[]
   leasePayments         LeasePayment[]
@@ -170,9 +170,9 @@ model LeaseExtraCharge {
 
 model LeasePayment {
   id                    Int                    @id @default(autoincrement())
-  lease                 Lease                  @relation(fields: [leaseId], references: [id], onDelete: Restrict)
+  lease                 Lease                  @relation(fields: [leaseId], references: [id], onDelete: Cascade)
   leaseId               Int
-  user                  User                   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId                Int
   status                LeasePaymentStatuses   @default(Pending)
   amount                String
@@ -197,8 +197,8 @@ model LeasePaymentImage {
 
 model Reservation {
   id                    Int                    @id @default(autoincrement())
-  facility              Facility               @relation(fields: [facilityId], references: [id], onDelete: Restrict)
-  tenant                User                   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  facility              Facility               @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+  tenant                User                   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   facilityId            Int
   tenantId              Int
   totalAmount           String
@@ -212,9 +212,9 @@ model Reservation {
 
 model ReservationPayment {
   id                      Int                    @id @default(autoincrement())
-  reservation             Reservation            @relation(fields: [reservationId], references: [id], onDelete: Restrict)
+  reservation             Reservation            @relation(fields: [reservationId], references: [id], onDelete: Cascade)
   reservationId           Int
-  user                    User                   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  user                    User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId                  Int
   status                  LeasePaymentStatuses   @default(Pending)
   amount                  String
