@@ -14,6 +14,10 @@ export class CreatePropertyDto {
   readonly propertyLocationPhaseId: number;
 
   @IsNotEmpty()
+  @IsNumber()
+  readonly propertyLocationLotId: number;
+
+  @IsNotEmpty()
   @IsString()
   readonly name: string;
 

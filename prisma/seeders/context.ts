@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 
 import { CreateExtra } from './strategies/create-extra.strategy';
 import { CreatePropertyLocationBlock } from './strategies/create-property-location-block.strategy';
+import { CreatePropertyLocationLot } from './strategies/create-property-location-lot.strategy';
 import { CreatePropertyLocationPhase } from './strategies/create-property-location-phase.strategy';
 import { CreatePropertyType } from './strategies/create-property-type.strategy';
 import { CreateUserStrategy } from './strategies/create-user.strategy';
@@ -19,6 +20,7 @@ export class SeedersContext {
       new CreatePropertyType(),
       new CreatePropertyLocationBlock(),
       new CreatePropertyLocationPhase(),
+      new CreatePropertyLocationLot(),
       new CreateUtility(),
       new CreateExtra(),
     ];

@@ -11,6 +11,10 @@ export class UpdatePropertyDto {
 
   @IsOptional()
   @IsNumber()
+  readonly propertyLocationLotId?: number;
+
+  @IsOptional()
+  @IsNumber()
   readonly propertyLocationPhaseId?: number;
 
   @IsOptional()

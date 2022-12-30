@@ -6,6 +6,7 @@ import { PaginateParams } from '../../commons/types';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePropertyDto, UpdatePropertyDto } from './dtos';
 import { PropertyLocationBlockService } from './property-location-block.service';
+import { PropertyLocationLotService } from './property-location-lot.service';
 import { PropertyLocationPhaseService } from './property-location-phase.service';
 import { PropertyTypeService } from './property-type.service';
 
@@ -15,6 +16,7 @@ export class PropertyService {
     private readonly prisma: PrismaService,
     private readonly propertyTypeService: PropertyTypeService,
     private readonly propertyBlockService: PropertyLocationBlockService,
+    private readonly propertyLotService: PropertyLocationLotService,
     private readonly propertyPhaseService: PropertyLocationPhaseService,
   ) {}
 
@@ -31,6 +33,8 @@ export class PropertyService {
     await this.propertyBlockService.findOneOrThrow(
       params.propertyLocationBlockId,
     );
+
+    await this.propertyLotService.findOneOrThrow(params.propertyLocationLotId);
 
     await this.propertyPhaseService.findOneOrThrow(
       params.propertyLocationPhaseId,
@@ -53,6 +57,7 @@ export class PropertyService {
     const property = await this.findUnique({
       include: {
         propertyLocationBlock: true,
+        propertyLocationLot: true,
         propertyLocationPhase: true,
         propertyType: true,
       },
@@ -72,6 +77,7 @@ export class PropertyService {
     return await this.findMany({
       include: {
         propertyLocationBlock: true,
+        propertyLocationLot: true,
         propertyLocationPhase: true,
         propertyType: true,
       },

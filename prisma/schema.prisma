@@ -54,14 +54,24 @@ model PropertyLocationBlock {
   properties         Property[]
 }
 
+model PropertyLocationLot {
+  id                 Int                @id              @default(autoincrement())
+  name               String             @db.VarChar(128) @unique
+  display            String             @db.VarChar(128)
+  description        String?            @db.Text
+  properties         Property[]
+}
+
 model Property {
   id                          Int                      @id              @default(autoincrement())
   propertyTypeId              Int
   propertyLocationPhaseId     Int
   propertyLocationBlockId     Int
+   propertyLocationLotId      Int
   propertyType                PropertyType             @relation(fields: [propertyTypeId], references: [id], onDelete: Cascade)
   propertyLocationPhase       PropertyLocationPhase    @relation(fields: [propertyLocationPhaseId], references: [id], onDelete: Cascade)
   propertyLocationBlock       PropertyLocationBlock    @relation(fields: [propertyLocationBlockId], references: [id], onDelete: Cascade)
+  propertyLocationLot         PropertyLocationLot      @relation(fields: [propertyLocationLotId], references: [id], onDelete: Cascade)
   leasese                     Lease[]
   name                        String                   @db.VarChar(255)
   amount                      String                   @db.VarChar(255)
