@@ -57,4 +57,30 @@ export class SpaceDriveService {
       throw new HttpException('Failed to upload file', HttpStatus.BAD_REQUEST);
     }
   }
+
+  async deleteFolder(params: { bucket: string; prefix: string }) {
+    const { bucket, prefix } = params;
+    try {
+      const objects = await this.s3
+        .listObjectsV2({
+          Bucket: bucket,
+          Prefix: prefix,
+        })
+        .promise();
+
+      return this.s3
+        .deleteObjects({
+          Bucket: bucket,
+          Delete: {
+            Objects: objects.Contents.map((content) => ({ Key: content.Key })),
+          },
+        })
+        .promise();
+    } catch (error) {
+      this.logger.error(
+        `DO Space failed to delete folder = ${error.message}, bucket: ${bucket}`,
+      );
+      this.logger.error(error.stack);
+    }
+  }
 }

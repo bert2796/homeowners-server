@@ -22,13 +22,13 @@ export class ReservationPaymentController {
   constructor(private readonly service: ReservationPaymentService) {}
 
   @Post('/')
-  @UseInterceptors(FilesInterceptor('images'))
   @HttpCode(HttpStatus.CREATED)
   @Authorize([UserRoles.Tenant])
+  @UseInterceptors(FilesInterceptor('images'))
   async createReservationPayment(
+    @Req() req: { user: User },
     @UploadedFiles() images: Express.Multer.File[],
     @Body() params: CreateReservationPaymentDto,
-    @Req() req: { user: User },
   ) {
     return await this.service.create(params, req.user.id, images);
   }

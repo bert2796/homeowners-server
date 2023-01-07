@@ -10,11 +10,14 @@ import {
   Post,
   Query,
   Req,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { User, UserRoles } from '@prisma/client';
 
 import { Authorize } from '../../commons/decorators/authorize.decorator';
-import { CreateUserDto, UpdateUserDto } from './dtos';
+import { CreateUserDto, UpdatePasswordUserDto, UpdateUserDto } from './dtos';
 import { UserService } from './user.service';
 
 @Controller('users')
@@ -26,6 +29,28 @@ export class UserController {
   @Authorize()
   async login(@Req() req: { user: User }) {
     return req.user;
+  }
+
+  @Patch('/me')
+  @UseInterceptors(FileInterceptor('avatar'))
+  @HttpCode(HttpStatus.OK)
+  @Authorize()
+  async updateMe(
+    @Req() req: { user: User },
+    @UploadedFile() avatar: Express.Multer.File,
+    @Body() params: UpdateUserDto,
+  ) {
+    return await this.service.update(req.user.id, params, avatar);
+  }
+
+  @Patch('/me/password')
+  @HttpCode(HttpStatus.OK)
+  @Authorize()
+  async updateMePassword(
+    @Req() req: { user: User },
+    @Body() params: UpdatePasswordUserDto,
+  ) {
+    return await this.service.updatePassword(req.user.id, params);
   }
 
   @Get('/')

@@ -13,6 +13,7 @@ datasource db {
 
 model User {
   id                      Int             @id              @default(autoincrement())
+  avatar                  String?         @db.VarChar(255)
   firstName               String          @db.VarChar(128)
   middleName              String?         @db.VarChar(128)
   lastName                String          @db.VarChar(128)
@@ -67,7 +68,7 @@ model Property {
   propertyTypeId              Int
   propertyLocationPhaseId     Int
   propertyLocationBlockId     Int
-   propertyLocationLotId      Int
+  propertyLocationLotId      Int
   propertyType                PropertyType             @relation(fields: [propertyTypeId], references: [id], onDelete: Cascade)
   propertyLocationPhase       PropertyLocationPhase    @relation(fields: [propertyLocationPhaseId], references: [id], onDelete: Cascade)
   propertyLocationBlock       PropertyLocationBlock    @relation(fields: [propertyLocationBlockId], references: [id], onDelete: Cascade)
@@ -187,7 +188,7 @@ model LeasePayment {
   status                LeasePaymentStatuses   @default(Pending)
   amount                String
   leasePaymentImages    LeasePaymentImage[]
-  reason                String?
+  reason                String?                @db.Text
   otherReason           String?
   otherReasonDetails    String?
   createdAt             DateTime               @default(now())

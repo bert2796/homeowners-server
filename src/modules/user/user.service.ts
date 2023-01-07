@@ -1,12 +1,17 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 
+import { isSamePassword } from '../../commons/utils';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateUserDto, UpdateUserDto } from './dtos';
+import { SpaceDriveService } from '../space-drive/space-drive.service';
+import { CreateUserDto, UpdatePasswordUserDto, UpdateUserDto } from './dtos';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly spaceDriveService: SpaceDriveService,
+  ) {}
 
   private model = this.prisma.user;
   private findFirst = this.prisma.user.findFirst;
@@ -18,6 +23,24 @@ export class UserService {
       delete user[key];
     }
     return user;
+  }
+
+  private async uploadAvatar(image: Express.Multer.File, user: User) {
+    // delete folder first
+    await this.spaceDriveService.deleteFolder({
+      bucket: 'homeowners',
+      prefix: `avatar/${user.id}/`,
+    });
+
+    // upload new avatar
+    const fileExtension = image.mimetype.split('/')?.[1] || 'jpeg';
+    const uploadImage = await this.spaceDriveService.uploadFile({
+      bucket: `homeowners/avatar/${user.id}`,
+      file: image,
+      name: `avatar.${fileExtension}`,
+    });
+
+    return uploadImage.Location;
   }
 
   async findOneOrThrow(id: number) {
@@ -57,11 +80,35 @@ export class UserService {
     return this.exclude(createdUser, ['password']);
   }
 
-  async update(id: number, params: UpdateUserDto) {
-    await this.findOneOrThrow(id);
+  async update(id: number, params: UpdateUserDto, file?: Express.Multer.File) {
+    const user = await this.findOneOrThrow(id);
+    let avatarUrl = '';
+
+    if (file) {
+      avatarUrl = await this.uploadAvatar(file, user);
+    }
 
     const updatedUser = await this.model.update({
-      data: params,
+      data: { ...params, ...(avatarUrl && { avatar: avatarUrl }) },
+      where: { id },
+    });
+
+    return this.exclude(updatedUser, ['password']);
+  }
+
+  async updatePassword(id: number, params: UpdatePasswordUserDto) {
+    const user = await this.findOneOrThrow(id);
+
+    const hasSamePassword = await isSamePassword({
+      passwordToCompare: params.currentPassword,
+      signedPassword: user.password,
+    });
+    if (!hasSamePassword) {
+      throw new HttpException('Invalid password', HttpStatus.BAD_REQUEST);
+    }
+
+    const updatedUser = await this.model.update({
+      data: { password: params.newPassword },
       where: { id },
     });
 
