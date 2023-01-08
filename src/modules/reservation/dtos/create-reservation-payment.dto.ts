@@ -1,9 +1,9 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateReservationPaymentDto {
   @IsNotEmpty()
-  @IsString()
-  readonly reservationId: string;
+  @IsNumber()
+  readonly reservationId: number;
 
   @IsNotEmpty()
   @IsString()

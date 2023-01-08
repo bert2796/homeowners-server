@@ -8,8 +8,12 @@ import {
   Param,
   Post,
   Query,
+  Req,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
-import { UserRoles } from '@prisma/client';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { User, UserRoles } from '@prisma/client';
 
 import { Authorize } from '../../commons/decorators/authorize.decorator';
 import { CreateReservationDto } from './dtos';
@@ -36,8 +40,13 @@ export class ReservationController {
   @Post('/')
   @HttpCode(HttpStatus.CREATED)
   @Authorize([UserRoles.Tenant])
-  async createReservation(@Body() params: CreateReservationDto) {
-    return await this.service.create(params);
+  @UseInterceptors(FilesInterceptor('images'))
+  async createReservation(
+    @Req() req: { user: User },
+    @UploadedFiles() images: Express.Multer.File[],
+    @Body() params: CreateReservationDto,
+  ) {
+    return await this.service.create(params, req.user.id, images);
   }
 
   @Delete('/:id')

@@ -15,6 +15,7 @@ export class FacilityService {
   ) {}
 
   private model = this.prisma.facility;
+  private facilityImageModel = this.prisma.facilityImage;
   private findFirst = this.model.findFirst;
   private findMany = this.model.findMany;
   private findUnique = this.model.findUnique;
@@ -96,11 +97,32 @@ export class FacilityService {
     const facility = await this.findOneOrThrow(id);
 
     if (images?.length) {
+      // delete related images
+      await this.facilityImageModel.deleteMany({
+        where: { facilityId: facility.id },
+      });
+
+      // delete old images in space drive
+      await this.spaceDriveService.deleteFolder({
+        bucket: 'homeowners',
+        prefix: `facility_images/${facility.id}`,
+      });
+
       await this.uploadImages(facility, images);
     }
 
     return await this.model.update({
-      data: params,
+      data: {
+        ...(params?.name && { name: params.name }),
+        ...(params?.description && { description: params.description }),
+        facilityPaymentSetting: {
+          update: {
+            ...(params?.downPayment && { downPayment: params.downPayment }),
+            ...(params?.amount && { amount: params.amount }),
+            ...(params?.type && { type: params.type }),
+          },
+        },
+      },
       where: { id },
     });
   }

@@ -5,6 +5,7 @@ import { FacilityService } from '../facility/facility.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from '../user/user.service';
 import { CreateReservationDto } from './dtos';
+import { ReservationPaymentService } from './reservation-payment.service';
 
 @Injectable()
 export class ReservationService {
@@ -14,6 +15,7 @@ export class ReservationService {
     private readonly prisma: PrismaService,
     private readonly facilityService: FacilityService,
     private readonly userService: UserService,
+    private readonly reservationPaymentService: ReservationPaymentService,
   ) {}
 
   private model = this.prisma.reservation;
@@ -34,15 +36,14 @@ export class ReservationService {
     return await this.findMany({
       include: {
         facility: true,
-        tenant: true,
-        ...(userId && {
-          reservationPayments: {
-            orderBy: {
-              id: 'desc',
-            },
-            take: 1,
+        reservationPayments: {
+          orderBy: {
+            id: 'desc',
           },
-        }),
+          take: 1,
+        },
+
+        tenant: true,
       },
       ...(userId && { where: { tenantId: userId } }),
     });
@@ -66,7 +67,11 @@ export class ReservationService {
     return lease;
   }
 
-  async create(params: CreateReservationDto) {
+  async create(
+    params: CreateReservationDto,
+    userId: number,
+    images: Express.Multer.File[],
+  ) {
     const reservation = await this.findFirst({
       where: {
         startDate: params.startDate,
@@ -81,11 +86,11 @@ export class ReservationService {
 
     // validate facility
     const facility = await this.facilityService.findOneOrThrow(
-      params.facilityId,
+      +params.facilityId,
     );
 
     // validate tenant
-    await this.userService.findOneOrThrow(params.tenantId);
+    await this.userService.findOneOrThrow(+params.tenantId);
 
     // get time diff
     const timeDiff =
@@ -104,12 +109,26 @@ export class ReservationService {
       total = new Big(facilityRate).times(8).toString();
     }
 
-    return await this.model.create({
+    const newReservation = await this.model.create({
       data: {
-        ...params,
+        endDate: params.endDate,
+        facilityId: +params.facilityId,
+        startDate: params.startDate,
+        tenantId: +params.tenantId,
         totalAmount: total,
       },
     });
+
+    // create reservation payment
+    if (images.length) {
+      await this.reservationPaymentService.create(
+        { amount: params.amount, reservationId: newReservation.id },
+        userId,
+        images,
+      );
+    }
+
+    return newReservation;
   }
 
   async delete(id: number) {
