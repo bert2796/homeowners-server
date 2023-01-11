@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 export const UserEventHandler =
   () =>

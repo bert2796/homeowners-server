@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { PrismaClient, UserRoles } from '@prisma/client';
-import { genSalt, hash } from 'bcrypt';
+import { genSalt, hash } from 'bcryptjs';
 
 import { SeederStrategy } from './interface';
 
